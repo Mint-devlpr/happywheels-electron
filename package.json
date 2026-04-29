@@ -1,0 +1,48 @@
+{
+  "name": "happy-wheels-electron",
+  "version": "1.0.0",
+  "description": "Happy Wheels Source Code demo:  https://mrsnailman.github.io/Happy-Wheels-Source-Code/",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist:linux": "electron-builder --linux deb AppImage",
+    "dist:win": "electron-builder --win portable",
+    "dist:mac": "electron-builder --mac dmg"
+  },
+  "build": {
+    "appId": "com.happywheels.electron",
+    "productName": "Happy Wheels",
+    "files": [
+      "**/*",
+      "!node_modules/electron*",
+      "!node_modules/.cache",
+      "!dist"
+    ],
+    "linux": {
+      "target": ["deb", "AppImage"],
+      "category": "Game"
+    },
+    "win": {
+      "target": "portable"
+    },
+    "mac": {
+      "target": "dmg"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrSnailman/Happy-Wheels-Source-Code.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MrSnailman/Happy-Wheels-Source-Code/issues"
+  },
+  "homepage": "https://github.com/MrSnailman/Happy-Wheels-Source-Code#readme",
+  "devDependencies": {
+    "electron": "^41.3.0",
+    "electron-builder": "^26.8.1"
+  }
+}
