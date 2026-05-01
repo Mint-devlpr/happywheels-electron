@@ -1,6 +1,6 @@
 {
   "name": "happy-wheels-electron",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Happy Wheels Source Code demo:  https://mrsnailman.github.io/Happy-Wheels-Source-Code/",
   "main": "main.js",
   "scripts": {
@@ -12,6 +12,7 @@
   "build": {
     "appId": "com.happywheels.electron",
     "productName": "Happy Wheels",
+    "icon": "build/icon",
     "files": [
       "**/*",
       "!node_modules/electron*",
@@ -20,21 +21,27 @@
     ],
     "linux": {
       "target": ["deb", "AppImage"],
-      "category": "Game"
+      "category": "Game",
+      "icon": "build/icon.png"
     },
     "win": {
-      "target": "portable"
+      "target": "portable",
+      "icon": "build/icon.ico"
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "build/icon.icns"
     }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MrSnailman/Happy-Wheels-Source-Code.git"
+    "url": "git+https://github.com/speedybebop1/happy-wheels-electron.git"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "speedybebop1",
+    "email": "speedybebop1@gmail.com"
+  },
   "license": "ISC",
   "type": "commonjs",
   "bugs": {

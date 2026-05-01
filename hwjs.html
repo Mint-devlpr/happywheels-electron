@@ -11,28 +11,43 @@
             overflow: hidden;
             background-color: black;
         }
-        /* width */
-        ::-webkit-scrollbar {
-            width: 10px;
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #666666; }
+        ::-webkit-scrollbar-thumb { background: #CCCCCC; }
+        ::-webkit-scrollbar-thumb:hover { background: #CCCCCC; }
+        html { scrollbar-color: #CCCCCC #666666; scrollbar-width: thin; background-color: black; }
+
+
+        #hw-intro {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            pointer-events: none;
+            background: url('assets/freeze frame.png') center center / cover no-repeat black;
+            filter: grayscale(100%);
+            transition: opacity 1s ease;
+        }
+        #hw-intro.hidden {
+            opacity: 0;
+        }
+        #hw-intro-text {
+            color: #ffffff;
+            font-size: 22px;
+            font-family: Arial, sans-serif;
+            letter-spacing: 3px;
+            text-transform: lowercase;
+            text-shadow: 0 0 20px rgba(255,255,255,0.6), 0 2px 6px rgba(0,0,0,0.9);
+            filter: none;
+            animation: hw-pulse 2s ease-in-out infinite;
+        }
+        @keyframes hw-pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
         }
 
-        /* Track */
-        ::-webkit-scrollbar-track {
-            background: #666666; 
-        }
-        
-        /* Handle */
-        ::-webkit-scrollbar-thumb {
-            background: #CCCCCC; 
-        }
-
-        /* Handle on hover */
-        ::-webkit-scrollbar-thumb:hover {
-            background: #CCCCCC; 
-        }
-
-        /* stupid firefox */
-        html {scrollbar-color: #CCCCCC #666666; scrollbar-width: thin; background-color: black;}
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -71,22 +86,81 @@
         (function() {
             function getTitleLabel() {
                 var labels = [
-                    "JS Edition",
-                    "HTML5 Edition",
-                    "Flashless Version",
-                    "RIP Flash Edition",
-                    "Flash Is Dead!",
-                    "Farewell Flash...",
-                    "Without that plugin",
-                    "Does Jim know I put this here?"
+                    "oh hi mark",
+                    "Desktop Edition",
+                    "gore the lord!",
+                    "flash? i hardly know er!",
+                    "now with 25% more maturity!",
+                    "now with controller support",
+                    "did you know WASD works now?",
+                    "praise paul!",
+                    "how did you land that bottle flip?",
+                    "built on flash tears",
+                    "javascript did its best",
+                    "desktop era hits different",
+                    "flash is dead, long live pain",
+                    "ported with questionable decisions",
+                    "same chaos, new engine",
+                    "html5 but make it hurt",
+                    "this used to lag differently",
+                    "now with 100% less flash crashes",
+                    "legacy bugs included for nostalgia",
+                    "modern tech, ancient suffering",
+                    "your childhood but worse",
+                    "that definitely shouldn't have worked",
+                    "who coded this??",
+                    "speedrunners fear this build",
+                    "you call that a landing?",
+                    "task failed successfully",
+                    "input detected, dignity lost",
+                    "retry button looking real nice",
+                    "frame perfect or faceplant",
+                    "this is why we can't have nice things",
+                    "congrats, you made it worse",
+                    "he's not getting up from that",
+                    "you felt that one",
+                    "pain.exe has stopped working",
+                    "no clip? no, just broken",
+                    "that looked expensive",
+                    "we kept the suffering authentic",
+                    "certified bad idea",
+                    "just walk it off (you can't)",
+                    "he'll be fine (he won't)",
+                    "physics said no",
+                    "the ground wins again",
+                    "this build bites back",
+                    "you knew better",
+                    "and yet you tried anyway",
+                    "i would tell a physics joke, but you wouldn't get it",
+                    "i tried to make a wheel joke… it went flat",
+                    "this game has issues… mostly tissue",
+"                    i'm reading a book on anti-gravity, can't put it down",
+                    "i used to hate stairs… now they’re just a step up",
+                    "i told my pc a joke… it didn’t process it",
+                    "i'm afraid for the calendar… its days are numbered",
+                    "i only know 25 letters… i don’t know y",
+                    "i stayed up all night to fix bugs… still buggy",
+                    "this joke is wheel-y bad",
+                    "braking news: you crashed again",
+                    "that crash had me in pieces",
+                    "i used to be a dev… then i lost my balance",
+                    "these puns are by design flaw",
+                    "i’d explain the code… but it’s a bit of a stretch",
+                    "flash is fuel, adobie is dead, happywheels is full",
+                    "screw you im putting more shit here"
                 ]
                 return labels[Math.floor(Math.random() * labels.length)];
             }
 
+            var _launch = window.HW_LAUNCH || {};
+            var _resMap = { '1280x720':1, '1280x800':1, '1920x1080':1, '2560x1440':1.5, '3840x2160':2 };
+            var _hwRes  = _resMap[_launch.resolution] || 1;
+            var _hwFps  = (parseInt(_launch.fps) > 0) ? parseInt(_launch.fps) : 60;  // 60 = native speed
+
             window["HW_SETTINGS"] = {
-                fps: 30,
-                resolution: 1,
-                resolutionFullscreen: 2,
+                fps: _hwFps,
+                resolution: _hwRes,
+                resolutionFullscreen: _hwRes * 2,
                 siteURL: "https://totaljerkface.com/",
                 // assetsURL: "http://hwjs.totaljerkface.com/",
                 pathPrefix: '',
@@ -139,8 +213,46 @@
             }
         })();
     </script>
-<div id="og-game-holder">
-<p style="color:white" id="loading-indicator">Loading...</p>
+<div id="og-game-holder"></div>
+
+<div id="hw-intro">
+  <span id="hw-intro-text">please wait while we load...</span>
 </div>
+
+<script>
+  (function () {
+    var holder = document.getElementById('og-game-holder')
+    var intro  = document.getElementById('hw-intro')
+
+    function onReady() {
+      intro.classList.add('hidden')
+      setTimeout(function () { intro.remove() }, 900)
+
+      setTimeout(function () {
+        holder.classList.remove('hw-loading')
+        var canvas = document.querySelector('canvas')
+        if (canvas) canvas.focus()
+      }, 400)
+    }
+
+    // Poll until PIXI stage has named children (main menu is up)
+    // Fallback: always clear after 10s no matter what
+    var fallback = setTimeout(function () {
+      clearInterval(poll)
+      onReady()
+    }, 10000)
+
+    var poll = setInterval(function () {
+      var app = window.__PIXI_APP__ || window.app
+      if (!app || !app.stage) return
+      if ((app.stage.children || []).length > 0) {
+        clearInterval(poll)
+        clearTimeout(fallback)
+
+        setTimeout(onReady, 5000)
+      }
+    }, 250)
+  })()
+</script>
 </body>
 </html>

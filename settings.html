@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Happy Wheels — Settings</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1a1a;
+    color: #eee;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0 16px;
+    gap: 14px;
+    user-select: none;
+    overflow: hidden;
+  }
+  h1 { font-size: 18px; letter-spacing: 3px; color: #fff; }
+  .sections {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 320px;
+  }
+  .section-title {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #e8a000;
+    margin-bottom: 4px;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2a2a2a;
+    border-radius: 5px;
+    padding: 8px 12px;
+    gap: 10px;
+  }
+  .row + .row { margin-top: 3px; }
+  .row label { flex: 1; }
+  .row .hint { font-size: 11px; color: #777; margin-top: 2px; }
+  select {
+    background: #3a3a3a;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 120px;
+  }
+  input[type=checkbox] {
+    width: 16px; height: 16px;
+    cursor: pointer;
+    accent-color: #e8a000;
+    flex-shrink: 0;
+  }
+  .slider-wrap { display: flex; align-items: center; gap: 6px; min-width: 140px; }
+  input[type=range] {
+    flex: 1;
+    accent-color: #e8a000;
+    cursor: pointer;
+  }
+  .slider-val { min-width: 28px; text-align: right; color: #aaa; font-size: 12px; }
+  .actions {
+    width: 320px;
+    display: flex;
+    gap: 8px;
+  }
+  button {
+    flex: 1;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  #btn-launch { background: #e8a000; color: #111; }
+  #btn-launch:hover { background: #ffc020; }
+  #btn-reset { background: #333; color: #aaa; }
+  #btn-reset:hover { background: #444; color: #eee; }
+</style>
+</head>
+<body>
+<h1>HAPPY WHEELS</h1>
+<div class="sections">
+
+  <div>
+    <div class="section-title">Display</div>
+    <div class="row">
+      <label>Resolution</label>
+      <select id="resolution">
+        <option value="1280x720">1280×720 (720p)</option>
+        <option value="1280x800" selected>1280×800 (Default)</option>
+        <option value="1920x1080">1920×1080 (1080p)</option>
+        <option value="2560x1440">2560×1440 (1440p)</option>
+        <option value="3840x2160">3840×2160 (4K)</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>Fullscreen</label>
+      <input type="checkbox" id="fullscreen">
+    </div>
+    <div class="row">
+      <label>Always on Top</label>
+      <input type="checkbox" id="alwaysOnTop">
+    </div>
+  </div>
+
+  <div>
+    <div class="section-title">Performance</div>
+    <div class="row">
+      <label>FPS Cap<div class="hint">60 = normal speed. 30 = slow motion</div></label>
+      <select id="fps">
+        <option value="30">30 fps</option>
+        <option value="60" selected>60 fps</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>GPU Acceleration<div class="hint">Disable if game crashes on launch</div></label>
+      <input type="checkbox" id="gpu" checked>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-title">Controls</div>
+    <div class="row">
+      <label>Gamepad Deadzone</label>
+      <div class="slider-wrap">
+        <input type="range" id="deadzone" min="0" max="50" value="15">
+        <span class="slider-val" id="deadzone-val">15%</span>
+      </div>
+    </div>
+    <div class="row">
+      <label>Swap A / B Buttons<div class="hint">Nintendo layout</div></label>
+      <input type="checkbox" id="swapAB">
+    </div>
+  </div>
+
+  <div>
+    <div class="section-title">Other</div>
+    <div class="row">
+      <label>Skip this screen next time</label>
+      <input type="checkbox" id="skipSettings">
+    </div>
+  </div>
+
+</div>
+<div class="actions">
+  <button id="btn-reset">Reset</button>
+  <button id="btn-launch">Launch</button>
+</div>
+
+<script>
+  const { ipcRenderer } = require('electron')
+
+  const fields = {
+    resolution:   { el: document.getElementById('resolution'),   type: 'select',   default: '1280x800' },
+    fullscreen:   { el: document.getElementById('fullscreen'),   type: 'checkbox', default: false },
+    alwaysOnTop:  { el: document.getElementById('alwaysOnTop'),  type: 'checkbox', default: false },
+    fps:          { el: document.getElementById('fps'),          type: 'select',   default: '60' },
+    gpu:          { el: document.getElementById('gpu'),          type: 'checkbox', default: true },
+    deadzone:     { el: document.getElementById('deadzone'),     type: 'range',    default: 15 },
+    swapAB:       { el: document.getElementById('swapAB'),       type: 'checkbox', default: false },
+    skipSettings: { el: document.getElementById('skipSettings'), type: 'checkbox', default: false },
+  }
+
+  const deadzoneVal = document.getElementById('deadzone-val')
+  fields.deadzone.el.addEventListener('input', () => {
+    deadzoneVal.textContent = fields.deadzone.el.value + '%'
+  })
+
+  function applySettings(saved) {
+    for (const [key, f] of Object.entries(fields)) {
+      if (saved[key] === undefined) continue
+      if (f.type === 'checkbox') f.el.checked = saved[key]
+      else f.el.value = saved[key]
+    }
+    deadzoneVal.textContent = fields.deadzone.el.value + '%'
+  }
+
+  ipcRenderer.on('load-settings', (e, saved) => applySettings(saved))
+
+  function collect() {
+    const s = {}
+    for (const [key, f] of Object.entries(fields)) {
+      if (f.type === 'checkbox') s[key] = f.el.checked
+      else if (f.type === 'range') s[key] = parseInt(f.el.value)
+      else s[key] = f.el.value
+    }
+    const [w, h] = s.resolution.split('x').map(Number)
+    s.width = w; s.height = h
+    return s
+  }
+
+  function reset() {
+    for (const [key, f] of Object.entries(fields)) {
+      if (f.type === 'checkbox') f.el.checked = f.default
+      else f.el.value = f.default
+    }
+    deadzoneVal.textContent = fields.deadzone.el.value + '%'
+  }
+
+  document.getElementById('btn-launch').addEventListener('click', () => {
+    ipcRenderer.send('launch', collect())
+  })
+
+  document.getElementById('btn-reset').addEventListener('click', reset)
+</script>
+</body>
+</html>
