@@ -8,6 +8,9 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
+echo "==> Cleaning dist/..."
+rm -rf dist/
+
 echo "==> Building Linux (deb + AppImage)..."
 npm run dist:linux
 
